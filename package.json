@@ -1,0 +1,22 @@
+{
+  "name": "playwright_testing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fatimaZhara/Playwright_Testing.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fatimaZhara/Playwright_Testing/issues"
+  },
+  "homepage": "https://github.com/fatimaZhara/Playwright_Testing#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.55.1",
+    "@types/node": "^24.6.1"
+  }
+}
