@@ -1,0 +1,174 @@
+import { test, expect } from '@playwright/test';
+import { LoginPage } from '../pages/loginPage';
+import { ProductPage } from '../pages/productsPage';
+import { CartPage } from '../pages/cartPage';
+
+test.describe('Cart Page Features', () => {
+    let loginPage: LoginPage;
+    let productsPage: ProductPage;
+    let cartPage: CartPage;
+
+    test.beforeEach(async ({ page }) => {
+        loginPage = new LoginPage(page);
+        productsPage = new ProductPage(page);
+        cartPage = new CartPage(page);
+
+        // Login with valid credentials
+        await loginPage.open();
+        await loginPage.login('standard_user', 'secret_sauce');
+        
+        // Start with a clean cart for each test
+        await page.goto('https://www.saucedemo.com/inventory.html');
+    });
+
+    // Positive Test Cases
+    test.describe('Positive Scenarios', () => {
+        test('should add single item to cart successfully', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await cartPage.goToCart();
+            const itemCount = await cartPage.getCartItemsCount();
+            expect(itemCount).toBe(1);
+        });
+
+        test('should add multiple items to cart successfully', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await productsPage.addToCart('sauce-labs-bike-light');
+            await cartPage.goToCart();
+            const itemCount = await cartPage.getCartItemsCount();
+            expect(itemCount).toBe(2);
+        });
+
+        test('should remove items from cart successfully', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await cartPage.goToCart();
+            await cartPage.removeItem();
+            const finalCount = await cartPage.getCartItemsCount();
+            expect(finalCount).toBe(0);
+        });
+
+        test('should continue shopping and return to products page', async () => {
+            await cartPage.goToCart();
+            await cartPage.continueShopping();
+            await expect(productsPage.page).toHaveURL('https://www.saucedemo.com/inventory.html');
+        });
+
+        test('should complete checkout process with valid information', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await cartPage.goToCart();
+            await cartPage.proceedToCheckout();
+            await cartPage.fillCheckoutInfo('John', 'Doe', '12345');
+            await cartPage.completeCheckout();
+            const confirmMessage = await cartPage.getOrderConfirmationMessage();
+            expect(confirmMessage).toBe('Thank you for your order!');
+        });
+
+        test('should display correct item total for multiple items', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await productsPage.addToCart('sauce-labs-bike-light');
+            await cartPage.goToCart();
+            const totalPrice = await cartPage.getTotalPrice();
+            expect(totalPrice).toBeGreaterThan(0);
+        });
+
+        test('should persist cart items after navigating away and back', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await cartPage.goToCart();
+            await cartPage.continueShopping();
+            await cartPage.goToCart();
+            const persistedCount = await cartPage.getCartItemsCount();
+            expect(persistedCount).toBe(1);
+        });
+    });
+
+    // Negative Test Cases
+    test.describe('Negative Scenarios', () => {
+        test('should show error for empty first name during checkout', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await cartPage.goToCart();
+            await cartPage.proceedToCheckout();
+            await cartPage.fillCheckoutInfo('', 'Doe', '12345');
+            const errorMessage = await cartPage.getErrorMessage();
+            expect(errorMessage).toContain('First Name is required');
+        });
+
+        test('should show error for empty last name during checkout', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await cartPage.goToCart();
+            await cartPage.proceedToCheckout();
+            await cartPage.fillCheckoutInfo('John', '', '12345');
+            const errorMessage = await cartPage.getErrorMessage();
+            expect(errorMessage).toContain('Last Name is required');
+        });
+
+        test('should show error for empty postal code during checkout', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await cartPage.goToCart();
+            await cartPage.proceedToCheckout();
+            await cartPage.fillCheckoutInfo('John', 'Doe', '');
+            const errorMessage = await cartPage.getErrorMessage();
+            expect(errorMessage).toContain('Postal Code is required');
+        });
+
+        test('should handle checkout with empty cart', async () => {
+            await cartPage.goToCart();
+            await cartPage.proceedToCheckout();
+            const errorMessage = await cartPage.getErrorMessage();
+            expect(errorMessage).toContain('Cart is empty');
+        });
+
+        test('should handle special characters in checkout information', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await cartPage.goToCart();
+            await cartPage.proceedToCheckout();
+            await cartPage.fillCheckoutInfo('John@#$', 'Doe!@#', '12345@#$');
+            const errorMessage = await cartPage.getErrorMessage();
+            expect(errorMessage).toContain('Invalid input');
+        });
+
+        test('should handle very long input in checkout fields', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await cartPage.goToCart();
+            await cartPage.proceedToCheckout();
+            const longString = 'a'.repeat(256);
+            await cartPage.fillCheckoutInfo(longString, longString, longString);
+            const errorMessage = await cartPage.getErrorMessage();
+            expect(errorMessage).toContain('Input too long');
+        });
+    });
+
+    // Edge Cases
+    test.describe('Edge Cases', () => {
+        test('should handle rapid add/remove item actions', async () => {
+            for (let i = 0; i < 5; i++) {
+                await productsPage.addToCart('sauce-labs-backpack');
+                await cartPage.goToCart();
+                await cartPage.removeItem();
+                await cartPage.continueShopping();
+            }
+            await cartPage.goToCart();
+            const finalCount = await cartPage.getCartItemsCount();
+            expect(finalCount).toBe(0);
+        });
+
+        test('should maintain cart state after page refresh', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await cartPage.goToCart();
+            await cartPage.page.reload();
+            const refreshedCount = await cartPage.getCartItemsCount();
+            expect(refreshedCount).toBe(1);
+        });
+
+        test('should handle multiple checkout attempts with same items', async () => {
+            await productsPage.addToCart('sauce-labs-backpack');
+            await cartPage.goToCart();
+            await cartPage.proceedToCheckout();
+            await cartPage.fillCheckoutInfo('John', 'Doe', '12345');
+            await cartPage.page.goBack();
+            await cartPage.proceedToCheckout();
+            await cartPage.fillCheckoutInfo('Jane', 'Smith', '54321');
+            await cartPage.completeCheckout();
+            const confirmMessage = await cartPage.getOrderConfirmationMessage();
+            expect(confirmMessage).toBe('Thank you for your order!');
+        });
+    });
+});

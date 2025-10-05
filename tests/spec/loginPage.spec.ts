@@ -42,14 +42,23 @@ test.describe('Login Feature', () => {
         await loginPage.assertInvalidLoginMessage();
     });
 
+    test('Failed Login (Empty username)', async ({ page }) => {
+        await loginPage.loginWithEnterKey('', 'secret_sauce');
+        const errorMessage = await loginPage.invalidLoginMessage.textContent();
+        expect(errorMessage).toBe('Epic sadface: Username is required');
+    });
 
+    test('Failed Login (Empty password)', async ({ page }) => {
+        await loginPage.loginWithEnterKey('standard_user', '');
+        const errorMessage = await loginPage.invalidLoginMessage.textContent();
+        expect(errorMessage).toBe('Epic sadface: Password is required');
+    });
 
-
-
-
-
-
-
+    test('Failed Login (Both fields empty)', async ({ page }) => {
+        await loginPage.loginWithEnterKey('', '');
+        const errorMessage = await loginPage.invalidLoginMessage.textContent();
+        expect(errorMessage).toBe('Epic sadface: Username is required');
+    });
 });
 
 
