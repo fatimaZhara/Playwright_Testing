@@ -59,5 +59,4 @@ export class LoginPage {
         await expect(this.invalidLoginMessage).toBeVisible();
     }
 
-
 }

@@ -19,6 +19,7 @@ test.describe('Login Feature', () => {
 
     test('Successful Login', async ({ page }) => {
         await loginPage.loginWithEnterKey('standard_user', 'secret_sauce');
+        await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
 
     });
 
@@ -27,7 +28,7 @@ test.describe('Login Feature', () => {
         // await page.goto('https://www.saucedemo.com/');
         await loginPage.loginWithEnterKey('standard_user', '12345');
         await loginPage.assertInvalidLoginMessage();
-        await page.getByText('Swag Labs').click();
+        // await page.getByText('Swag Labs').click();
 
     });
 
