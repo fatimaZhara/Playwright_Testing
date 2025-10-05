@@ -76,7 +76,7 @@ test.describe('Products Page Feature', () => {
     });
     test(' 7. Verify number of cart icaon decrease qwhen remove product ', async ({ page }) => {
 
-     
+
         await productsPage.addToCart("sauce-labs-backpack");
         await productsPage.verifyCartBadgeCount(1);
         await productsPage.remveProductFromCart("sauce-labs-backpack");
