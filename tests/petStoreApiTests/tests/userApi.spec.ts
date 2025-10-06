@@ -13,7 +13,7 @@ test.describe('User API Tests', () => {
     test('Should create a new user successfully', async () => {
         const userData = {
             id: 9,
-            username: "fatmss",
+            username: "fatima",
             firstName: "Abu",
             lastName: "cc",
             email: "string",
@@ -32,7 +32,7 @@ test.describe('User API Tests', () => {
     });
 
     test('Should retrieve user details by username', async () => {
-        const username = "fatmss";
+        const username = "fatima";
         const response = await userApi.getUserByUsername(username);
         console.log('Response status:', response.status());
 
@@ -40,17 +40,17 @@ test.describe('User API Tests', () => {
     });
 
     test('Should delete user by username', async () => {
-        const username = "fatmss";
+        const username = "fatima";
         const response = await userApi.deleteUserByUsername(username);
         console.log('Response status:', response.status());
         expect(response.status()).toBe(200);
     });
 
     test('Should update user details by username', async () => {
-        const username = "fatmss";
+        const username = "fatima";
         const updatedUserData = {
             id: 9,
-            username: "fatmss",
+            username: "leena",
             firstName: "AbuUpdated",
             lastName: "ccUpdated",
             email: "string",
@@ -65,7 +65,7 @@ test.describe('User API Tests', () => {
     });
 
     test('Should login user with valid credentials', async () => {
-        const username = "fatmss";
+        const username = "fatima";
         const password = "string";
         const response = await userApi.loginUser(username, password);
         console.log('Response status:', response.status());
@@ -78,7 +78,7 @@ test.describe('User API Tests', () => {
         const response = await userApi.loginUser(username, password);
         console.log('Response status:', response.status());
         expect(response.status()).toBe(400); // 
-    } );  
+    });
 
 
 });
