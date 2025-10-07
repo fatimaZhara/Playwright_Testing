@@ -1,8 +1,12 @@
 import { APIRequestContext, expect } from '@playwright/test';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 
 export class StoreApi {
     private request: APIRequestContext;
-    private baseUrl: string = 'https://petstore.swagger.io/v2';
+
+    private readonly baseUrl = process.env.BASE_URL
 
     constructor(request: APIRequestContext) {
         this.request = request;

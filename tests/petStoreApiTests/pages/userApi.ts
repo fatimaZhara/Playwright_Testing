@@ -1,57 +1,57 @@
 import { APIRequestContext } from '@playwright/test';
+import { User } from '../types/api.types';
+//import { env } from 'process';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+
 
 export class UserApi {
-    constructor(private request: APIRequestContext) { }
+    private readonly request: APIRequestContext;
 
-    async createUser(userData: any) {
-        const response = await this.request.post('https://petstore.swagger.io/v2/user', {
+
+    private readonly baseUrl = process.env.BASE_URL
+
+    constructor(request: APIRequestContext) {
+        this.request = request;
+    }
+
+    async createUser(userData: User) {
+        return await this.request.post(`${this.baseUrl}/user`, {
             headers: {
                 'accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             data: userData
         });
-        return response;
     }
 
     async getUserByUsername(username: string) {
-        const response = await this.request.get(`https://petstore.swagger.io/v2/user/${username}`, {
-            headers: {
-                'accept': 'application/json'
-            }
+        return await this.request.get(`${this.baseUrl}/user/${username}`, {
+            headers: { 'accept': 'application/json' }
         });
-        return response;
     }
 
-    //delete user by username
     async deleteUserByUsername(username: string) {
-        const response = await this.request.delete(`https://petstore.swagger.io/v2/user/${username}`, {
-            headers: {
-                'accept': 'application/json'
-            }
+        return await this.request.delete(`${this.baseUrl}/user/${username}`, {
+            headers: { 'accept': 'application/json' }
         });
-        return response;
     }
 
-    //UPDATE user by username
-    async updateUserByUsername(username: string, userData: any) {
-        const response = await this.request.put(`https://petstore.swagger.io/v2/user/${username}`, {
+    async updateUserByUsername(username: string, userData: User) {
+        return await this.request.put(`${this.baseUrl}/user/${username}`, {
             headers: {
                 'accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             data: userData
         });
-        return response;
     }
 
-    //login user by username and password
     async loginUser(username: string, password: string) {
-        const response = await this.request.get(`https://petstore.swagger.io/v2/user/login?username=${username}&password=${password}`, {
-            headers: {
-                'accept': 'application/json'
-            }
-        });
-        return response;
+        return await this.request.get(
+            `${this.baseUrl}/user/login?username=${username}&password=${password}`,
+            { headers: { 'accept': 'application/json' } }
+        );
     }
 }

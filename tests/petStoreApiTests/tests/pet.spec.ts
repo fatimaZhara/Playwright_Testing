@@ -176,7 +176,7 @@ test.describe('Pet Store API - Pet Tests', () => {
         };
         await petApi.addNewPet(petData);
         //wait
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 4000));
 
         // Delete the pet
         const { status } = await petApi.deletePet(testPetId);

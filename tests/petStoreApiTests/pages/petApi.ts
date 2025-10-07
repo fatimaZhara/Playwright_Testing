@@ -1,9 +1,12 @@
 import { APIRequestContext, APIResponse, expect } from '@playwright/test';
 import { Pet, ApiResponse } from '../types/api.types';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export class PetApi {
     private readonly request: APIRequestContext;
-    private readonly baseUrl: string = 'https://petstore.swagger.io/v2';
+    // private readonly baseUrl: string = 'https://petstore.swagger.io/v2';
+    private readonly baseUrl = process.env.BASE_URL
 
     constructor(request: APIRequestContext) {
         this.request = request;
